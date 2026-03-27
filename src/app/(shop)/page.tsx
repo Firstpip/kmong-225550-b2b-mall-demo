@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { products } from '@/data/products';
 import { categories } from '@/data/categories';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSearch } from '@/contexts/SearchContext';
 import PopupOverlay from '@/components/PopupOverlay';
 
 const banners = [
   { title: '3월 대량구매 특별 할인', subtitle: '50만원 이상 주문 시 추가 5% 할인', bg: 'from-primary to-primary-light' },
   { title: '신상품 입고 안내', subtitle: '사무용품 신규 라인업을 확인하세요', bg: 'from-secondary to-secondary-light' },
-  { title: 'VIP 회원 전용 혜택', subtitle: '최대 12% 할인 + 무료배송', bg: 'from-primary-dark to-primary' },
+  { title: '회원 전용 특별 혜택', subtitle: '최대 12% 할인 + 무료배송', bg: 'from-primary-dark to-primary' },
 ];
 
 function formatPrice(price: number) {
@@ -19,7 +20,9 @@ function formatPrice(price: number) {
 
 export default function HomePage() {
   const { role, currentUser } = useAuth();
+  const { searchQuery } = useSearch();
   const [currentBanner, setCurrentBanner] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -33,9 +36,9 @@ export default function HomePage() {
   const visibleProducts = products.filter(p => {
     if (!p.isActive) return false;
     if (role === 'admin') return true;
-    const group = currentUser?.memberGroup || 'standard';
-    return p.visibleToGroups.includes(group);
-  });
+    return true;
+  }).filter(p => !selectedCategory || p.category === selectedCategory)
+    .filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.includes(searchQuery));
 
   return (
     <div id="home-page">
@@ -71,12 +74,21 @@ export default function HomePage() {
           {categories.map(cat => (
             <div
               key={cat.id}
-              className="card p-6 text-center hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
+              className={`card p-6 text-center hover:shadow-md transition-shadow cursor-pointer ${selectedCategory === cat.name ? 'ring-2 ring-primary' : ''}`}
             >
               <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <span className="text-primary text-2xl">
-                  {cat.slug === 'food-beverage' ? '🍽' : cat.slug === 'living' ? '🏠' : cat.slug === 'office' ? '📋' : '👕'}
-                </span>
+                <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  {cat.slug === 'food-beverage' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.379a48.474 48.474 0 00-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 013 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 016 13.12M12.265 3.11a.375.375 0 11-.53 0L12 2.845l.265.265zm-3 0a.375.375 0 11-.53 0L9 2.845l.265.265zm6 0a.375.375 0 11-.53 0L15 2.845l.265.265z" />
+                  ) : cat.slug === 'living' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  ) : cat.slug === 'office' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  )}
+                </svg>
               </div>
               <h3 className="font-medium text-neutral-900">{cat.name}</h3>
               <p className="text-xs text-neutral-400 mt-1">{cat.productCount}개 상품</p>
@@ -87,25 +99,19 @@ export default function HomePage() {
 
       {/* Products grid */}
       <section id="products" className="max-w-7xl mx-auto px-4 pb-12">
-        <h2 className="text-2xl font-bold text-neutral-900 mb-6">전체 상품</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-neutral-900">{selectedCategory || '전체 상품'}</h2>
+          {selectedCategory && (
+            <button onClick={() => setSelectedCategory(null)} className="text-sm text-neutral-400 hover:text-neutral-600 cursor-pointer">전체 보기</button>
+          )}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {visibleProducts.map(product => {
             const discountedPrice = Math.round(product.basePrice * (1 - discountRate / 100));
             return (
               <Link key={product.id} href={`/products/${product.id}`} className="card overflow-hidden group hover:shadow-md transition-shadow">
-                {/* Image placeholder */}
-                <div className="aspect-square bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center relative">
-                  <div className="text-center">
-                    <div className="text-4xl mb-2">
-                      {product.category === '식품/음료' ? '🍽' : product.category === '생활용품' ? '🏠' : product.category === '사무용품' ? '📋' : '👕'}
-                    </div>
-                    <span className="text-xs text-neutral-400">상품 이미지</span>
-                  </div>
-                  {!product.visibleToGroups.includes('standard') && (
-                    <span className="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-0.5 rounded-full">
-                      VIP
-                    </span>
-                  )}
+                <div className="aspect-square bg-neutral-100 relative overflow-hidden">
+                  <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
                 </div>
                 {/* Info */}
                 <div className="p-4">

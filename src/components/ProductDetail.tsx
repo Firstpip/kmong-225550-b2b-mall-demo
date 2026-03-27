@@ -30,6 +30,7 @@ export default function ProductDetail({ id }: { id: string }) {
   });
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'detail' | 'info'>('detail');
+  const [selectedImage, setSelectedImage] = useState(0);
 
   if (!product) {
     return (
@@ -104,18 +105,17 @@ export default function ProductDetail({ id }: { id: string }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         <div>
-          <div className="aspect-square bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl flex items-center justify-center mb-4">
-            <div className="text-center">
-              <div className="text-6xl mb-3">
-                {product.category === '식품/음료' ? '🍽' : product.category === '생활용품' ? '🏠' : product.category === '사무용품' ? '📋' : '👕'}
-              </div>
-              <span className="text-neutral-400 text-sm">상품 이미지</span>
-            </div>
+          <div className="aspect-square bg-neutral-100 rounded-xl overflow-hidden mb-4">
+            <img src={product.images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {product.images.map((_, i) => (
-              <div key={i} className="aspect-square bg-neutral-100 rounded-lg flex items-center justify-center text-xs text-neutral-400 cursor-pointer hover:ring-2 ring-primary transition-all">
-                이미지 {i + 1}
+            {product.images.map((imgSrc, i) => (
+              <div
+                key={i}
+                onClick={() => setSelectedImage(i)}
+                className={`aspect-square bg-neutral-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 ring-primary transition-all ${selectedImage === i ? 'ring-2 ring-primary' : ''}`}
+              >
+                <img src={imgSrc} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
               </div>
             ))}
           </div>
@@ -170,7 +170,7 @@ export default function ProductDetail({ id }: { id: string }) {
                 -
               </button>
               <input
-                type="number"
+                type="text" inputMode="numeric" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }}
                 min={1}
                 max={Math.min(product.purchaseLimit.maxQuantity, selectedStock)}
                 value={quantity}
@@ -237,9 +237,7 @@ export default function ProductDetail({ id }: { id: string }) {
 
       <div className="max-w-3xl">
         {activeTab === 'detail' ? (
-          <div className="prose prose-sm text-neutral-600 whitespace-pre-line">
-            {product.detailDescription}
-          </div>
+          <div className="product-detail-content" dangerouslySetInnerHTML={{ __html: product.detailDescription }} />
         ) : (
           <table className="w-full text-sm">
             <tbody>
@@ -254,10 +252,6 @@ export default function ProductDetail({ id }: { id: string }) {
               <tr className="border-b border-neutral-100">
                 <td className="py-3 text-neutral-400">기본가</td>
                 <td className="py-3">{formatPrice(product.basePrice)}원</td>
-              </tr>
-              <tr className="border-b border-neutral-100">
-                <td className="py-3 text-neutral-400">공개 등급</td>
-                <td className="py-3">{product.visibleToGroups.join(', ').toUpperCase()}</td>
               </tr>
             </tbody>
           </table>

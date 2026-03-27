@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthGuardProps {
   children: ReactNode;
-  requiredRole?: 'standard' | 'vip' | 'admin' | 'any';
+  requiredRole?: 'member' | 'admin' | 'any';
 }
 
 export default function AuthGuard({ children, requiredRole = 'any' }: AuthGuardProps) {

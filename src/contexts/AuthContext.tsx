@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { members, type Member } from '@/data/members';
 
-type Role = 'guest' | 'standard' | 'vip' | 'admin';
+type Role = 'guest' | 'member' | 'admin';
 
 interface AuthContextType {
   currentUser: Member | null;
@@ -32,9 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else if (savedRole === 'admin') {
           setCurrentUser(null);
         } else {
-          const defaultMember = savedRole === 'vip'
-            ? members.find(m => m.memberGroup === 'vip' && m.status === 'approved')
-            : members.find(m => m.memberGroup === 'standard' && m.status === 'approved');
+          const defaultMember = members.find(m => m.status === 'approved');
           if (defaultMember) {
             setCurrentUser(defaultMember);
             localStorage.setItem('b2b-user', JSON.stringify(defaultMember));
@@ -51,11 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Demo: any credentials work. Try to find matching member, otherwise use first approved.
     const found = members.find(m => m.loginId === loginId && m.status === 'approved');
     const member = found || members.find(m => m.status === 'approved')!;
-    const memberRole: Role = member.memberGroup === 'vip' ? 'vip' : 'standard';
 
     setCurrentUser(member);
-    setRole(memberRole);
-    localStorage.setItem('b2b-role', memberRole);
+    setRole('member');
+    localStorage.setItem('b2b-role', 'member');
     localStorage.setItem('b2b-user', JSON.stringify(member));
     return true;
   }, []);
@@ -79,9 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCurrentUser(null);
       localStorage.removeItem('b2b-user');
     } else {
-      const member = newRole === 'vip'
-        ? members.find(m => m.memberGroup === 'vip' && m.status === 'approved')
-        : members.find(m => m.memberGroup === 'standard' && m.status === 'approved');
+      const member = members.find(m => m.status === 'approved');
       if (member) {
         setCurrentUser(member);
         localStorage.setItem('b2b-user', JSON.stringify(member));

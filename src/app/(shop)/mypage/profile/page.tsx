@@ -7,6 +7,7 @@ import { useToast } from '@/contexts/ToastContext';
 export default function MypageProfilePage() {
   const { currentUser } = useAuth();
   const { showToast } = useToast();
+  const [cashReceiptType, setCashReceiptType] = useState<'personal' | 'business'>('personal');
   const [cashReceiptNumber, setCashReceiptNumber] = useState(currentUser?.cashReceiptNumber || '');
 
   if (!currentUser) {
@@ -21,24 +22,17 @@ export default function MypageProfilePage() {
     <div id="mypage-profile">
       <h2 className="text-lg font-bold text-neutral-900 mb-4">회원정보</h2>
 
-      {/* Member grade */}
+      {/* Discount rate */}
       <div className="card p-6 mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-neutral-900">회원 등급</h3>
-            <p className="text-sm text-neutral-400 mt-1">현재 등급에 따른 할인 혜택이 적용됩니다.</p>
+            <h3 className="font-medium text-neutral-900">할인율</h3>
+            <p className="text-sm text-neutral-400 mt-1">회원별 개별 할인 혜택이 적용됩니다.</p>
           </div>
           <div className="text-right">
-            <span className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${
-              currentUser.memberGroup === 'vip'
-                ? 'bg-yellow-100 text-yellow-800'
-                : currentUser.memberGroup === 'premium'
-                ? 'bg-purple-100 text-purple-800'
-                : 'bg-blue-100 text-blue-800'
-            }`}>
-              {currentUser.memberGroup.toUpperCase()}
+            <span className="inline-block px-4 py-2 rounded-full text-sm font-bold bg-blue-100 text-blue-800">
+              {currentUser.discountRate}%
             </span>
-            <p className="text-sm text-primary font-bold mt-1">할인율: {currentUser.discountRate}%</p>
           </div>
         </div>
       </div>
@@ -85,19 +79,43 @@ export default function MypageProfilePage() {
       {/* Cash receipt */}
       <div className="card p-6">
         <h3 className="font-medium text-neutral-900 mb-4">현금영수증 설정</h3>
+        <div className="flex gap-3 mb-3">
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="radio"
+              name="cashReceiptType"
+              checked={cashReceiptType === 'personal'}
+              onChange={() => { setCashReceiptType('personal'); setCashReceiptNumber(''); }}
+            />
+            <span className="text-sm">개인 (휴대폰번호)</span>
+          </label>
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="radio"
+              name="cashReceiptType"
+              checked={cashReceiptType === 'business'}
+              onChange={() => { setCashReceiptType('business'); setCashReceiptNumber(currentUser.businessNumber || ''); }}
+            />
+            <span className="text-sm">사업자 (사업자번호)</span>
+          </label>
+        </div>
         <div className="flex gap-3">
           <input
             type="text"
             value={cashReceiptNumber}
             onChange={(e) => setCashReceiptNumber(e.target.value)}
             className="input-field max-w-xs"
-            placeholder="010-0000-0000"
+            placeholder={cashReceiptType === 'personal' ? '010-0000-0000' : '000-00-00000'}
           />
           <button onClick={handleSave} className="btn-primary">
             저장
           </button>
         </div>
-        <p className="text-xs text-neutral-400 mt-2">주문 시 현금영수증 발행에 사용됩니다.</p>
+        <p className="text-xs text-neutral-400 mt-2">
+          {cashReceiptType === 'personal'
+            ? '휴대폰번호로 개인 현금영수증이 발행됩니다.'
+            : '사업자번호로 지출증빙용 현금영수증이 발행됩니다.'}
+        </p>
       </div>
     </div>
   );

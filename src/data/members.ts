@@ -13,7 +13,6 @@ export interface Member {
   businessLicense: string;
   retailDesignation: string;
   status: 'pending' | 'approved' | 'rejected' | 'suspended';
-  memberGroup: 'standard' | 'vip' | 'premium';
   discountRate: number;
   cashReceiptNumber: string;
   createdAt: string;
@@ -36,7 +35,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-001.pdf',
     retailDesignation: '/uploads/retail-001.pdf',
     status: 'approved',
-    memberGroup: 'standard',
     discountRate: 5,
     cashReceiptNumber: '010-1234-5678',
     createdAt: '2025-01-15',
@@ -57,7 +55,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-002.pdf',
     retailDesignation: '/uploads/retail-002.pdf',
     status: 'approved',
-    memberGroup: 'vip',
     discountRate: 10,
     cashReceiptNumber: '010-2345-6789',
     createdAt: '2024-11-20',
@@ -78,7 +75,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-003.pdf',
     retailDesignation: '/uploads/retail-003.pdf',
     status: 'approved',
-    memberGroup: 'standard',
     discountRate: 5,
     cashReceiptNumber: '031-3456-7890',
     createdAt: '2025-02-01',
@@ -99,7 +95,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-004.pdf',
     retailDesignation: '/uploads/retail-004.pdf',
     status: 'approved',
-    memberGroup: 'vip',
     discountRate: 12,
     cashReceiptNumber: '010-4567-8901',
     createdAt: '2024-10-05',
@@ -120,7 +115,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-005.pdf',
     retailDesignation: '/uploads/retail-005.pdf',
     status: 'approved',
-    memberGroup: 'standard',
     discountRate: 5,
     cashReceiptNumber: '051-5678-9012',
     createdAt: '2025-03-01',
@@ -141,7 +135,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-006.pdf',
     retailDesignation: '',
     status: 'pending',
-    memberGroup: 'standard',
     discountRate: 0,
     cashReceiptNumber: '010-6789-0123',
     createdAt: '2025-03-25',
@@ -161,7 +154,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-007.pdf',
     retailDesignation: '/uploads/retail-007.pdf',
     status: 'pending',
-    memberGroup: 'standard',
     discountRate: 0,
     cashReceiptNumber: '032-7890-1234',
     createdAt: '2025-03-26',
@@ -181,7 +173,6 @@ export const members: Member[] = [
     businessLicense: '/uploads/license-008.pdf',
     retailDesignation: '/uploads/retail-008.pdf',
     status: 'suspended',
-    memberGroup: 'standard',
     discountRate: 0,
     cashReceiptNumber: '010-8901-2345',
     createdAt: '2024-08-10',

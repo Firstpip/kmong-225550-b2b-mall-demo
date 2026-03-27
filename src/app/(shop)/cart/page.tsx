@@ -42,9 +42,12 @@ export default function CartPage() {
           <div className="lg:col-span-2 space-y-3">
             {items.map(item => (
               <div key={`${item.productId}-${item.optionValues}`} className="card p-4 flex gap-4">
-                {/* Image placeholder */}
-                <div className="w-20 h-20 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">📦</span>
+                <div className="w-20 h-20 bg-neutral-100 rounded-lg overflow-hidden flex-shrink-0">
+                  {item.productImage ? (
+                    <img src={item.productImage} alt={item.productName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-2xl">📦</div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-neutral-900 text-sm truncate">{item.productName}</h3>

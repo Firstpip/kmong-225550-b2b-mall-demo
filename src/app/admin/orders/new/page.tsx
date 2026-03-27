@@ -113,7 +113,7 @@ export default function AdminOrderCreatePage() {
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 flex items-center justify-between">
                 <div>
                   <p className="font-medium">{selectedMember.businessName}</p>
-                  <p className="text-xs text-neutral-400">{selectedMember.managerName} | {selectedMember.memberGroup.toUpperCase()} | 할인율: {selectedMember.discountRate}%</p>
+                  <p className="text-xs text-neutral-400">{selectedMember.managerName} | 할인율: {selectedMember.discountRate}%</p>
                 </div>
                 <button onClick={() => setSelectedMemberId('')} className="text-xs text-neutral-400 hover:text-error cursor-pointer">변경</button>
               </div>
@@ -126,7 +126,7 @@ export default function AdminOrderCreatePage() {
                     className="w-full text-left px-3 py-2 text-sm hover:bg-neutral-100 border-b border-neutral-100 last:border-0 transition-colors cursor-pointer"
                   >
                     <span className="font-medium">{m.businessName}</span>
-                    <span className="text-neutral-400 ml-2">{m.managerName} | {m.memberGroup.toUpperCase()}</span>
+                    <span className="text-neutral-400 ml-2">{m.managerName} | 할인율: {m.discountRate}%</span>
                   </button>
                 ))}
               </div>
@@ -194,7 +194,7 @@ export default function AdminOrderCreatePage() {
               <div>
                 <label className="label-field">수동 할인 (원)</label>
                 <input
-                  type="number"
+                  type="text" inputMode="numeric" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }}
                   value={manualDiscount}
                   onChange={(e) => setManualDiscount(Math.max(0, Number(e.target.value)))}
                   className="input-field"
@@ -226,7 +226,7 @@ export default function AdminOrderCreatePage() {
               </div>
               {autoDiscount > 0 && (
                 <div className="flex justify-between text-success">
-                  <span>등급 할인 ({selectedMember?.discountRate}%)</span>
+                  <span>회원 할인 ({selectedMember?.discountRate}%)</span>
                   <span>-{formatPrice(autoDiscount)}원</span>
                 </div>
               )}

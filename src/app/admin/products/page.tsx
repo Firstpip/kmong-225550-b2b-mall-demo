@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { products, type Product } from '@/data/products';
 import Modal from '@/components/Modal';
+import RichEditor from '@/components/RichEditor';
 import { useToast } from '@/contexts/ToastContext';
 
 function formatPrice(price: number) {
@@ -21,9 +22,9 @@ export default function AdminProductsPage() {
   const [editCategory, setEditCategory] = useState('');
   const [editPrice, setEditPrice] = useState('');
   const [editActive, setEditActive] = useState(true);
-  const [editGroups, setEditGroups] = useState<string[]>([]);
   const [editMinAmount, setEditMinAmount] = useState('');
   const [editMaxQty, setEditMaxQty] = useState('');
+  const [editDescription, setEditDescription] = useState('');
 
   const openEdit = (product: Product) => {
     setSelectedProduct(product);
@@ -31,9 +32,9 @@ export default function AdminProductsPage() {
     setEditCategory(product.category);
     setEditPrice(String(product.basePrice));
     setEditActive(product.isActive);
-    setEditGroups(product.visibleToGroups);
     setEditMinAmount(String(product.purchaseLimit.minAmount));
     setEditMaxQty(String(product.purchaseLimit.maxQuantity));
+    setEditDescription(product.detailDescription);
     setIsEditing(true);
   };
 
@@ -46,8 +47,8 @@ export default function AdminProductsPage() {
         category: editCategory,
         basePrice: Number(editPrice),
         isActive: editActive,
-        visibleToGroups: editGroups as Product['visibleToGroups'],
         purchaseLimit: { ...p.purchaseLimit, minAmount: Number(editMinAmount), maxQuantity: Number(editMaxQty) },
+        detailDescription: editDescription,
       } : p
     ));
     setIsEditing(false);
@@ -61,11 +62,10 @@ export default function AdminProductsPage() {
       name: editName || '새 상품',
       category: editCategory || '사무용품',
       description: '새로 등록된 상품입니다.',
-      detailDescription: '상품 상세 설명을 입력해주세요.',
+      detailDescription: editDescription || '<p>상품 상세 설명을 입력해주세요.</p>',
       images: ['/images/products/new.jpg'],
       basePrice: Number(editPrice) || 10000,
       options: [{ name: '기본', values: [{ label: '기본', stock: 100, additionalPrice: 0 }] }],
-      visibleToGroups: (editGroups.length > 0 ? editGroups : ['standard', 'vip', 'premium']) as Product['visibleToGroups'],
       purchaseLimit: { minAmount: Number(editMinAmount) || 10000, maxQuantity: Number(editMaxQty) || 100 },
       isActive: true,
       createdAt: new Date().toISOString().split('T')[0],
@@ -81,15 +81,9 @@ export default function AdminProductsPage() {
     setEditCategory('');
     setEditPrice('');
     setEditActive(true);
-    setEditGroups([]);
     setEditMinAmount('');
     setEditMaxQty('');
-  };
-
-  const toggleGroup = (group: string) => {
-    setEditGroups(prev =>
-      prev.includes(group) ? prev.filter(g => g !== group) : [...prev, group]
-    );
+    setEditDescription('');
   };
 
   const toggleActive = (id: string) => {
@@ -117,29 +111,22 @@ export default function AdminProductsPage() {
         </div>
         <div>
           <label className="label-field">기본가격 (원)</label>
-          <input type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} className="input-field" />
-        </div>
-      </div>
-      <div>
-        <label className="label-field">공개 대상 등급</label>
-        <div className="flex gap-3">
-          {['standard', 'vip', 'premium'].map(g => (
-            <label key={g} className="flex items-center gap-1.5 cursor-pointer">
-              <input type="checkbox" checked={editGroups.includes(g)} onChange={() => toggleGroup(g)} />
-              <span className="text-sm">{g.toUpperCase()}</span>
-            </label>
-          ))}
+          <input type="text" inputMode="numeric" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }} value={editPrice} onChange={(e) => setEditPrice(e.target.value)} className="input-field" />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="label-field">최소 주문금액 (원)</label>
-          <input type="number" value={editMinAmount} onChange={(e) => setEditMinAmount(e.target.value)} className="input-field" />
+          <input type="text" inputMode="numeric" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }} value={editMinAmount} onChange={(e) => setEditMinAmount(e.target.value)} className="input-field" />
         </div>
         <div>
           <label className="label-field">최대 주문수량</label>
-          <input type="number" value={editMaxQty} onChange={(e) => setEditMaxQty(e.target.value)} className="input-field" />
+          <input type="text" inputMode="numeric" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }} value={editMaxQty} onChange={(e) => setEditMaxQty(e.target.value)} className="input-field" />
         </div>
+      </div>
+      <div>
+        <label className="label-field">상세 설명</label>
+        <RichEditor value={editDescription} onChange={setEditDescription} />
       </div>
       {isEditing && (
         <label className="flex items-center gap-2 cursor-pointer">
@@ -192,7 +179,6 @@ export default function AdminProductsPage() {
                 <th className="text-left px-4 py-3 font-medium text-neutral-600">상품명</th>
                 <th className="text-left px-4 py-3 font-medium text-neutral-600">카테고리</th>
                 <th className="text-right px-4 py-3 font-medium text-neutral-600">가격</th>
-                <th className="text-center px-4 py-3 font-medium text-neutral-600">공개등급</th>
                 <th className="text-center px-4 py-3 font-medium text-neutral-600">상태</th>
                 <th className="text-center px-4 py-3 font-medium text-neutral-600">관리</th>
               </tr>
@@ -204,9 +190,6 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3 font-medium max-w-[200px] truncate">{product.name}</td>
                   <td className="px-4 py-3 text-neutral-400">{product.category}</td>
                   <td className="px-4 py-3 text-right">{formatPrice(product.basePrice)}원</td>
-                  <td className="px-4 py-3 text-center text-xs text-neutral-400">
-                    {product.visibleToGroups.map(g => g.toUpperCase()).join(', ')}
-                  </td>
                   <td className="px-4 py-3 text-center">
                     <button onClick={() => toggleActive(product.id)} className="cursor-pointer">
                       <span className={`inline-block w-3 h-3 rounded-full ${product.isActive ? 'bg-success' : 'bg-neutral-400'}`} />

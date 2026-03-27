@@ -4,17 +4,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useSearch } from '@/contexts/SearchContext';
 
 export default function Header() {
   const { role, currentUser, switchRole, logout } = useAuth();
   const { totalQuantity } = useCart();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery } = useSearch();
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
 
   const roles = [
     { value: 'guest' as const, label: '비로그인' },
-    { value: 'standard' as const, label: '일반회원' },
-    { value: 'vip' as const, label: 'VIP회원' },
+    { value: 'member' as const, label: '일반회원' },
     { value: 'admin' as const, label: '관리자' },
   ];
 
@@ -22,13 +22,13 @@ export default function Header() {
     <header id="header" className="bg-white border-b border-neutral-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Top bar */}
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">B2B</span>
+          <Link href="/" className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+            <div className="w-7 h-7 md:w-8 md:h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xs md:text-sm">B2B</span>
             </div>
-            <span className="text-xl font-bold text-primary">B2B MALL</span>
+            <span className="text-sm md:text-xl font-bold text-primary">B2B MALL</span>
           </Link>
 
           {/* Search bar */}
@@ -50,14 +50,14 @@ export default function Header() {
           </div>
 
           {/* Right actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 md:gap-4">
             {/* Role toggle */}
             <div id="role-toggle" className="relative">
               <button
                 onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs md:text-sm font-medium hover:bg-primary/20 transition-colors cursor-pointer"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 {roles.find(r => r.value === role)?.label}
@@ -101,24 +101,24 @@ export default function Header() {
 
             {/* My page / Admin */}
             {role === 'admin' ? (
-              <Link href="/admin" className="btn-primary text-sm !py-1.5">
-                관리자 페이지
+              <Link href="/admin" className="btn-primary text-xs md:text-sm !py-1.5 whitespace-nowrap">
+                관리자
               </Link>
             ) : role !== 'guest' ? (
-              <Link href="/mypage/orders" className="text-sm text-neutral-600 hover:text-primary transition-colors">
+              <Link href="/mypage/orders" className="text-xs md:text-sm text-neutral-600 hover:text-primary transition-colors whitespace-nowrap">
                 마이페이지
               </Link>
             ) : null}
 
             {/* Login/Logout */}
             {role === 'guest' ? (
-              <Link href="/login" className="btn-primary text-sm !py-1.5">
+              <Link href="/login" className="btn-primary text-xs md:text-sm !py-1.5 whitespace-nowrap">
                 로그인
               </Link>
             ) : (
               <button
                 onClick={logout}
-                className="text-sm text-neutral-400 hover:text-neutral-600 transition-colors cursor-pointer"
+                className="text-xs md:text-sm text-neutral-400 hover:text-neutral-600 transition-colors cursor-pointer whitespace-nowrap"
               >
                 로그아웃
               </button>
@@ -128,9 +128,9 @@ export default function Header() {
 
         {/* Logged-in user info bar */}
         {currentUser && (
-          <div className="flex items-center justify-between py-1.5 text-xs text-neutral-400 border-t border-neutral-100">
-            <span>{currentUser.businessName} | {currentUser.managerName}님</span>
-            <span>회원등급: <span className="font-medium text-primary">{currentUser.memberGroup.toUpperCase()}</span> | 할인율: {currentUser.discountRate}%</span>
+          <div className="flex items-center justify-between py-1.5 text-[10px] md:text-xs text-neutral-400 border-t border-neutral-100 overflow-hidden">
+            <span className="truncate">{currentUser.businessName} | {currentUser.managerName}님</span>
+            <span className="whitespace-nowrap ml-2">할인율: <span className="font-medium text-primary">{currentUser.discountRate}%</span></span>
           </div>
         )}
       </div>

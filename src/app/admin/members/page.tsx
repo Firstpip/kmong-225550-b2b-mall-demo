@@ -11,7 +11,6 @@ export default function AdminMembersPage() {
   const [memberList, setMemberList] = useState(members);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [editGroup, setEditGroup] = useState<string>('');
   const [editDiscount, setEditDiscount] = useState<string>('');
 
   const filtered = statusFilter === 'all'
@@ -27,7 +26,6 @@ export default function AdminMembersPage() {
 
   const openDetail = (member: Member) => {
     setSelectedMember(member);
-    setEditGroup(member.memberGroup);
     setEditDiscount(String(member.discountRate));
   };
 
@@ -55,11 +53,11 @@ export default function AdminMembersPage() {
     showToast('회원이 정지되었습니다.', 'warning');
   };
 
-  const handleSaveGroup = (id: string) => {
+  const handleSaveDiscount = (id: string) => {
     setMemberList(prev => prev.map(m =>
-      m.id === id ? { ...m, memberGroup: editGroup as Member['memberGroup'], discountRate: Number(editDiscount) } : m
+      m.id === id ? { ...m, discountRate: Number(editDiscount) } : m
     ));
-    showToast('등급/할인율이 변경되었습니다.', 'success');
+    showToast('할인율이 변경되었습니다.', 'success');
   };
 
   return (
@@ -91,7 +89,7 @@ export default function AdminMembersPage() {
                 <th className="text-left px-4 py-3 font-medium text-neutral-600">아이디</th>
                 <th className="text-left px-4 py-3 font-medium text-neutral-600">대표자</th>
                 <th className="text-left px-4 py-3 font-medium text-neutral-600">사업자번호</th>
-                <th className="text-center px-4 py-3 font-medium text-neutral-600">등급</th>
+                <th className="text-center px-4 py-3 font-medium text-neutral-600">할인율</th>
                 <th className="text-center px-4 py-3 font-medium text-neutral-600">상태</th>
                 <th className="text-center px-4 py-3 font-medium text-neutral-600">가입일</th>
                 <th className="text-center px-4 py-3 font-medium text-neutral-600">관리</th>
@@ -105,8 +103,8 @@ export default function AdminMembersPage() {
                   <td className="px-4 py-3">{member.ownerName}</td>
                   <td className="px-4 py-3 font-mono text-xs">{member.businessNumber}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`text-xs font-bold ${member.memberGroup === 'vip' ? 'text-yellow-600' : 'text-neutral-400'}`}>
-                      {member.memberGroup.toUpperCase()}
+                    <span className="text-xs font-bold text-primary">
+                      {member.discountRate}%
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center"><StatusBadge status={member.status} /></td>
@@ -155,21 +153,13 @@ export default function AdminMembersPage() {
 
             {/* Grade / discount edit */}
             <div className="bg-neutral-100 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-neutral-900 mb-3">등급 / 할인율 설정</h4>
+              <h4 className="text-sm font-medium text-neutral-900 mb-3">할인율 설정</h4>
               <div className="flex gap-3 items-end">
                 <div>
-                  <label className="text-xs text-neutral-400">등급</label>
-                  <select value={editGroup} onChange={(e) => setEditGroup(e.target.value)} className="input-field !py-1.5 text-sm">
-                    <option value="standard">Standard</option>
-                    <option value="vip">VIP</option>
-                    <option value="premium">Premium</option>
-                  </select>
+                  <label className="text-xs text-neutral-400 mb-1.5 block">할인율 (%)</label>
+                  <input type="text" inputMode="numeric" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }} value={editDiscount} onChange={(e) => setEditDiscount(e.target.value)} className="input-field !py-1.5 text-sm w-24" />
                 </div>
-                <div>
-                  <label className="text-xs text-neutral-400">할인율 (%)</label>
-                  <input type="number" min="0" max="30" value={editDiscount} onChange={(e) => setEditDiscount(e.target.value)} className="input-field !py-1.5 text-sm w-24" />
-                </div>
-                <button onClick={() => handleSaveGroup(selectedMember.id)} className="btn-primary text-sm !py-1.5">
+                <button onClick={() => handleSaveDiscount(selectedMember.id)} className="btn-primary text-sm !py-1.5">
                   저장
                 </button>
               </div>

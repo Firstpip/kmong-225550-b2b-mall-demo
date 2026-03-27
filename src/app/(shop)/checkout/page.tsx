@@ -79,8 +79,12 @@ export default function CheckoutPage() {
             <div className="space-y-3">
               {items.map(item => (
                 <div key={`${item.productId}-${item.optionValues}`} className="flex items-center gap-3 py-2 border-b border-neutral-100 last:border-0">
-                  <div className="w-12 h-12 bg-neutral-100 rounded flex items-center justify-center flex-shrink-0">
-                    <span className="text-lg">📦</span>
+                  <div className="w-12 h-12 bg-neutral-100 rounded overflow-hidden flex-shrink-0">
+                    {item.productImage ? (
+                      <img src={item.productImage} alt={item.productName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-lg">📦</div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-neutral-900 truncate">{item.productName}</p>
@@ -121,9 +125,23 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* Cash receipt */}
-            <div className="mt-4">
-              <label className="label-field">현금영수증 번호</label>
+          </div>
+
+          {/* Cash receipt & Tax invoice */}
+          <div className="card p-6">
+            <h2 className="font-bold text-neutral-900 mb-4">증빙 서류</h2>
+            <div>
+              <label className="label-field">현금영수증</label>
+              <div className="flex gap-3 mb-2">
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input type="radio" name="receiptType" defaultChecked />
+                  <span className="text-sm">개인 (휴대폰)</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input type="radio" name="receiptType" />
+                  <span className="text-sm">사업자 (사업자번호)</span>
+                </label>
+              </div>
               <input
                 type="text"
                 defaultValue={currentUser?.cashReceiptNumber || ''}

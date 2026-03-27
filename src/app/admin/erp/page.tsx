@@ -222,7 +222,7 @@ export default function ErpPage() {
             <div>
               <label className="label-field">동기화 간격 (분)</label>
               <input
-                type="number"
+                type="text" inputMode="numeric" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }}
                 value={config.syncInterval}
                 onChange={(e) => setConfig({ ...config, syncInterval: Number(e.target.value) })}
                 className="input-field w-32"
