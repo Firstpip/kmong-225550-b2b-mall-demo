@@ -7,6 +7,7 @@ import { products } from '@/data/products';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
+import { withBasePath } from '@/utils/basePath';
 
 function formatPrice(price: number) {
   return price.toLocaleString('ko-KR');
@@ -69,7 +70,7 @@ export default function ProductDetail({ id }: { id: string }) {
     addToCart({
       productId: product.id,
       productName: product.name,
-      productImage: product.images[0],
+      productImage: withBasePath(product.images[0]),
       optionValues: optionString,
       quantity,
       unitPrice: discountedUnitPrice,
@@ -85,7 +86,7 @@ export default function ProductDetail({ id }: { id: string }) {
     addToCart({
       productId: product.id,
       productName: product.name,
-      productImage: product.images[0],
+      productImage: withBasePath(product.images[0]),
       optionValues: optionString,
       quantity,
       unitPrice: discountedUnitPrice,
@@ -106,7 +107,7 @@ export default function ProductDetail({ id }: { id: string }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         <div>
           <div className="aspect-square bg-neutral-100 rounded-xl overflow-hidden mb-4">
-            <img src={product.images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
+            <img src={withBasePath(product.images[selectedImage])} alt={product.name} className="w-full h-full object-cover" />
           </div>
           <div className="grid grid-cols-4 gap-2">
             {product.images.map((imgSrc, i) => (
@@ -115,7 +116,7 @@ export default function ProductDetail({ id }: { id: string }) {
                 onClick={() => setSelectedImage(i)}
                 className={`aspect-square bg-neutral-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 ring-primary transition-all ${selectedImage === i ? 'ring-2 ring-primary' : ''}`}
               >
-                <img src={imgSrc} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                <img src={withBasePath(imgSrc)} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
               </div>
             ))}
           </div>
@@ -237,7 +238,7 @@ export default function ProductDetail({ id }: { id: string }) {
 
       <div className="max-w-3xl">
         {activeTab === 'detail' ? (
-          <div className="product-detail-content" dangerouslySetInnerHTML={{ __html: product.detailDescription }} />
+          <div className="product-detail-content" dangerouslySetInnerHTML={{ __html: product.detailDescription.replace(/src="\/images\//g, `src="${withBasePath('/images/')}"`) }} />
         ) : (
           <table className="w-full text-sm">
             <tbody>

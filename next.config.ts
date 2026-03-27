@@ -1,9 +1,14 @@
 import type { NextConfig } from "next";
 
+const basePath = process.env.GITHUB_PAGES ? '/kmong-225550-b2b-mall-demo' : '';
+
 const nextConfig: NextConfig = {
   output: 'export',
   trailingSlash: true,
-  basePath: process.env.GITHUB_PAGES ? '/kmong-225550-b2b-mall-demo' : '',
+  basePath,
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   images: {
     unoptimized: true,
   },

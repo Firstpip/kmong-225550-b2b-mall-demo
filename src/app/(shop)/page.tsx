@@ -7,6 +7,7 @@ import { categories } from '@/data/categories';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSearch } from '@/contexts/SearchContext';
 import PopupOverlay from '@/components/PopupOverlay';
+import { withBasePath } from '@/utils/basePath';
 
 const banners = [
   { title: '3월 대량구매 특별 할인', subtitle: '50만원 이상 주문 시 추가 5% 할인', bg: 'from-primary to-primary-light' },
@@ -111,7 +112,7 @@ export default function HomePage() {
             return (
               <Link key={product.id} href={`/products/${product.id}`} className="card overflow-hidden group hover:shadow-md transition-shadow">
                 <div className="aspect-square bg-neutral-100 relative overflow-hidden">
-                  <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                  <img src={withBasePath(product.images[0])} alt={product.name} className="w-full h-full object-cover" />
                 </div>
                 {/* Info */}
                 <div className="p-4">
